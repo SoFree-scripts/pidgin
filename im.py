@@ -4,6 +4,7 @@ import os
 import time
 import threading 
 import webbrowser
+#import pygame
 log = "C:\\Users\\Human\\Desktop\\Raven\\SOF PLATINUM\\user\\sof.log"
 func = "C:\\Users\\Human\\Desktop\\Raven\\SOF PLATINUM\\user\\sofplus\\data\\pidgin.cfg"
 
@@ -42,7 +43,7 @@ def checkUpdateLoop():
 				line = f.readlines()
 			for x in line:
 				#print all lines to widget
-				if ":" in x:
+				if ": [" in x:
 					insertMe = ""
 					for s in x.split():
 						if "http" not in s:
@@ -57,6 +58,8 @@ def checkUpdateLoop():
 							insertMe = " "
 					insertMe += "\n"
 					messages.insert(END, '%s' % insertMe)
+					#pygame.mixer.music.load("pop.mp3") #Loading File Into Mixer
+    				#pygame.mixer.music.play() #Playing It In The Whole Device
 					if float(scroll_y.get()[1]) > 0.9:
 						messages.see("end")
 		time.sleep(1)
@@ -84,6 +87,7 @@ def Enter_pressed(event):
     
     #send the line to SoFplus
     with open(func, "w") as f:
+    	input_get = input_get.replace("\"", "'")
     	say = "set msgString \"" + input_get + "\""
     	f.write(say)
     input_user.set('')
