@@ -1,5 +1,6 @@
 function pidgin_init()
 {
+	set logfile "2"
 	set msgString "0"
 	sp_sc_func_exec sof_pidgin_loop
 }
