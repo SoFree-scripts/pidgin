@@ -5,8 +5,8 @@ import time
 import threading 
 import webbrowser
 #import pygame
-log = "C:\\Users\\Human\\Desktop\\Raven\\SOF PLATINUM\\user\\sof.log"
-func = "C:\\Users\\Human\\Desktop\\Raven\\SOF PLATINUM\\user\\sofplus\\data\\pidgin.cfg"
+log = os.path.join(".","sof.log")
+func = os.path.join(".","sofplus/data/pidgin.cfg")
 
 window = Tk()
 
