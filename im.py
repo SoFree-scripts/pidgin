@@ -38,7 +38,7 @@ def checkUpdateLoop():
 		if int(oldsize) < fsize:
 			with open("seekdata", "w") as f:
 				f.write(str(fsize))
-			with open(log, "r",encoding="utf8") as f:
+			with open(log, "r",encoding="latin-1") as f:
 				f.seek(int(oldsize))
 				line = f.readlines()
 			for x in line:
