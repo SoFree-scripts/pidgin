@@ -14,22 +14,27 @@ func = os.path.join(".","sofplus/data/pidgin.cfg")
 window = Tk()
 window.title("SoF console")
 messages = Text(window)
-messages.pack()
+messages.configure(state="disable",wrap=WORD)
+
 
 
 
 
 input_user = StringVar()
 input_field = Entry(window, text=input_user)
-input_field.pack(side="bottom", fill=X,expand=True)
 scroll_y = Scrollbar(window, orient="vertical", command=messages.yview)
-scroll_y.pack(side="right", expand=True, fill="y")
+scroll_y.pack(side="right",fill="y")
+input_field.pack(side="bottom", fill="x")
+messages.pack(side="bottom")
+
 
 messages.configure(yscrollcommand=scroll_y.set)
 
 sizeOrig = os.path.getsize(log)
 with open("seekdata", "w") as f:
 	f.write(str(sizeOrig))
+
+mySlot = "@"
 
 def checkUpdateLoop():
 	while True:
@@ -48,6 +53,7 @@ def checkUpdateLoop():
 			for x in line:
 				#print all lines to widget
 				if ": [" in x:
+					#a chat message
 					insertMe = ""
 					messages.configure(state="normal")
 					for s in x.split():
@@ -63,10 +69,14 @@ def checkUpdateLoop():
 							insertMe = " "
 					insertMe += "\n"
 					messages.insert(END, '%s' % insertMe)
-					window.title("Unread")
-					#beep=pygame.mixer.Sound("hitmarker.wav") #Loading File Into Mixer
-					#beep.set_volume(0.02)
-					#beep.play() #Playing It In The Whole Device
+					if mySlot not in x:
+						#if its not our own input, no beep
+						window.title("Unread")
+						#beep=pygame.mixer.Sound("hitmarker.wav") #Loading File Into Mixer
+						#beep.set_volume(0.02)
+						#beep.play() #Playing It In The Whole Device
+					else:
+						print("no need to beep us right?")
 					if float(scroll_y.get()[1]) > 0.9:
 						messages.see("end")
 					messages.configure(state="disable")
@@ -84,17 +94,39 @@ def callback(event, tag):
     #print(event.widget.get('%s.first'%tag, '%s.last'%tag))
 
 def Enter_pressed(event):
+	global mySlot
 	window.title("SoF Console")
 	input_get = input_field.get()
+	ourLastMsg = input_get
 	#messages.insert(INSERT, '%s\n' % input_get)
 	# label = Label(window, text=input_get)
 	messages.see("end")
 
 	#send the line to SoFplus
-	with open(func, "w") as f:
+	#// cvar: pidgin.cfg msgString 0
+	#set "msgString" ""
+	#set "~slot" ""
+	with open(func, "r+") as f:
+		line = f.readlines()
+		print(line)
+		if "String" in line[2]:
+			tmp = line[1]
+			line[1] = line[2]
+			line[2] = tmp
+		mySlot = line[2].split()
+		num = mySlot[2].replace("\"","")
+		mySlot = ": [" + str(num) + "] "
 		input_get = input_get.replace("\"", "'")
-		say = "set msgString \"" + input_get + "\""
-		f.write(say)
+		line1 = "set msgString \"" + input_get + "\"\n"
+		line2 = "set ~slot \"" + str(num) + "\""
+		f.seek(0)
+		f.write("//Sssome cvars\n")
+		#this is what a headache looks like
+		f.write("                                 ")
+		f.write("                                 ")
+		f.seek(0)
+		f.write(line1)
+		f.write(line2)
 	input_user.set('')
 	return "break"
 
