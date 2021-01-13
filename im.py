@@ -25,6 +25,7 @@ input_field = Entry(window, text=input_user)
 scroll_y = Scrollbar(window, orient="vertical", command=messages.yview)
 scroll_y.pack(side="right",fill="y")
 input_field.pack(side="bottom", fill="x")
+input_field.focus_set()
 messages.pack(side="bottom")
 
 
