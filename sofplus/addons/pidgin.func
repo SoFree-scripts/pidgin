@@ -31,8 +31,8 @@ function sof_pidgin_get_slot(~var)
 	sp_sc_flow_if number cvar ~val == val 8
 	{
 		//we're in a game
-		set ~slot #_sp_cl_info_slot
 		sp_sc_exec_file sofplus/data/pidgin.cfg
+		set ~slot #_sp_cl_info_slot
 		sp_sc_cvar_save pidgin.cfg msgString ~slot
 	}
 }
