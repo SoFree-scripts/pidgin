@@ -4,12 +4,17 @@ import os
 import time
 import threading 
 import webbrowser
-#os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-#import pygame
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+import pygame
+from win32 import win32gui
+#test = win32gui.FindWindow("SoF console",None)
+#print(test)
+
 log = os.path.join(".","sof.log")
 func = os.path.join(".","sofplus/data/pidgin.cfg")
-#pygame.mixer.pre_init(frequency=44100, size=-16, channels=1, buffer=512)
-#pygame.mixer.init()
+desktop = os.path.join(".","sofplus/data/pidgin_desktop.cfg")
+pygame.mixer.pre_init(frequency=44100, size=-16, channels=1, buffer=512)
+pygame.mixer.init()
 
 window = Tk()
 window.title("SoF console")
@@ -36,9 +41,39 @@ with open("seekdata", "w") as f:
 	f.write(str(sizeOrig))
 
 mySlot = "@"
+winId = ""
+sofId = ""
 
 def checkUpdateLoop():
+	global winId
+	global sofId
+	nameSet = 0
+	nameRem = 0
 	while True:
+		#get winId
+		if winId == "":
+			#remove 'unread' title when window is maximised (ideally this would be some kind of hook)
+			win32gui.EnumWindows( winEnumHandler, None )
+		if sofId == "":
+			win32gui.EnumWindows( sofWinEnumHandler, None )
+		else:
+			#sof.exe open
+			if win32gui.GetForegroundWindow() != sofId:
+				with open(desktop, "r+") as f:
+					f.seek(0)
+					f.write("                                 \n")
+					f.write("                                 \n")
+					f.seek(0)
+					f.write("//desktop namehello    \n")
+					f.write("set ~desktop \"1\"       \n")
+			else:
+				with open(desktop, "r+") as f:
+					f.seek(0)
+					f.write("                                 \n")
+					f.write("                                 \n")
+					f.seek(0)
+					f.write("//desktop name12334   \n")
+					f.write("set ~desktop \"\"        \n")
 		with open("seekdata", "r") as f:
 			line = f.readlines()
 		oldsize = line[0].replace("\n","")
@@ -70,18 +105,31 @@ def checkUpdateLoop():
 							insertMe = " "
 					insertMe += "\n"
 					messages.insert(END, '%s' % insertMe)
+					print(mySlot)
 					if mySlot not in x:
 						#if its not our own input, no beep
 						window.title("Unread")
-						#beep=pygame.mixer.Sound("hitmarker.wav") #Loading File Into Mixer
-						#beep.set_volume(0.02)
-						#beep.play() #Playing It In The Whole Device
-					else:
-						print("no need to beep us right?")
+						beep=pygame.mixer.Sound("hitmarker.wav") #Loading File Into Mixer
+						beep.set_volume(0.02)
+						beep.play() #Playing It In The Whole Device
+					if win32gui.IsWindowVisible( winId ):
+						window.title("SoF Console")
 					if float(scroll_y.get()[1]) > 0.9:
 						messages.see("end")
 					messages.configure(state="disable")
 		time.sleep(1)
+def winEnumHandler( hwnd, ctx ):
+	global winId
+	#if win32gui.IsWindowVisible( hwnd ):
+	print (hex(hwnd), win32gui.GetWindowText( hwnd ))
+	if win32gui.GetWindowText( hwnd ) == "SoF console":
+		winId = hwnd
+def sofWinEnumHandler( hwnd, ctx ):
+	global sofId
+	#if win32gui.IsWindowVisible( hwnd ):
+	print (hex(hwnd), win32gui.GetWindowText( hwnd ))
+	if win32gui.GetWindowText( hwnd ) == "SoF":
+		sofId = hwnd
 
 def urlHandler(url):
 	#we have a httplink
@@ -98,37 +146,40 @@ def Enter_pressed(event):
 	global mySlot
 	window.title("SoF Console")
 	input_get = input_field.get()
-	ourLastMsg = input_get
-	#messages.insert(INSERT, '%s\n' % input_get)
-	# label = Label(window, text=input_get)
-	messages.see("end")
+	if input_get != "":
+		ourLastMsg = input_get
+		#messages.insert(INSERT, '%s\n' % input_get)
+		# label = Label(window, text=input_get)
+		messages.see("end")
 
-	#send the line to SoFplus
-	#// cvar: pidgin.cfg msgString 0
-	#set "msgString" ""
-	#set "~slot" ""
-	with open(func, "r+") as f:
-		line = f.readlines()
-		print(line)
-		if "String" in line[2]:
-			tmp = line[1]
-			line[1] = line[2]
-			line[2] = tmp
-		mySlot = line[2].split()
-		num = mySlot[2].replace("\"","")
-		mySlot = ": [" + str(num) + "] "
-		input_get = input_get.replace("\"", "'")
-		line1 = "set msgString \"" + input_get + "\"\n"
-		line2 = "set ~slot \"" + str(num) + "\""
-		f.seek(0)
-		f.write("//Sssome cvars\n")
-		#this is what a headache looks like
-		f.write("                                 ")
-		f.write("                                 ")
-		f.seek(0)
-		f.write(line1)
-		f.write(line2)
-	input_user.set('')
+		#send the line to SoFplus
+		#// cvar: pidgin.cfg msgString 0
+		#set "msgString" ""
+		#set "~slot" ""
+		with open(func, "r+") as f:
+			line = f.readlines()
+			print(line)
+			if "String" in line[2]:
+				tmp = line[1]
+				line[1] = line[2]
+				line[2] = tmp
+			mySlot = line[2].split()
+			print(mySlot)
+			num = mySlot[2].replace("\"","")
+			mySlot = ": [" + str(num) + "] "
+			print(mySlot)
+			input_get = input_get.replace("\"", "'")
+			line1 = "set msgString \"" + input_get + "\"\n"
+			line2 = "set ~slot \"" + str(num) + "\""
+			print("line2 =:" + line2)
+			f.seek(0)
+			f.write("//Sssome cvars\n")
+			f.write("                                 ")
+			f.write("                                 ")
+			f.seek(0)
+			f.write(line1)
+			f.write(line2)
+		input_user.set('')
 	return "break"
 
 
