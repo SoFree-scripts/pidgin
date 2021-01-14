@@ -5,7 +5,7 @@ import time
 import threading 
 import webbrowser
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-import pygame
+from pygame import mixer
 from win32 import win32gui
 #test = win32gui.FindWindow("SoF console",None)
 #print(test)
@@ -13,13 +13,14 @@ from win32 import win32gui
 log = os.path.join(".","sof.log")
 func = os.path.join(".","sofplus/data/pidgin.cfg")
 desktop = os.path.join(".","sofplus/data/pidgin_desktop.cfg")
-pygame.mixer.pre_init(frequency=44100, size=-16, channels=1, buffer=512)
-pygame.mixer.init()
+mixer.pre_init(frequency=44100, size=-16, channels=1, buffer=512)
+mixer.init()
 
 window = Tk()
+
 window.title("SoF console")
 messages = Text(window)
-messages.configure(state="disable",wrap=WORD)
+messages.configure(state="disable",wrap=WORD,bg="black",fg="white")
 
 
 
@@ -27,7 +28,9 @@ messages.configure(state="disable",wrap=WORD)
 
 input_user = StringVar()
 input_field = Entry(window, text=input_user)
+input_field.configure(bg="grey",fg="white")
 scroll_y = Scrollbar(window, orient="vertical", command=messages.yview)
+scroll_y.configure(bg="black")
 scroll_y.pack(side="right",fill="y")
 input_field.pack(side="bottom", fill="x")
 input_field.focus_set()
@@ -105,18 +108,18 @@ def checkUpdateLoop():
 							insertMe = " "
 					insertMe += "\n"
 					messages.insert(END, '%s' % insertMe)
-					print(mySlot)
+					#print(mySlot)
 					if mySlot not in x:
 						#if its not our own input, no beep
 						window.title("Unread")
-						beep=pygame.mixer.Sound("hitmarker.wav") #Loading File Into Mixer
+						beep=mixer.Sound("hitmarker.wav") #Loading File Into Mixer
 						beep.set_volume(0.02)
 						beep.play() #Playing It In The Whole Device
-					if win32gui.IsWindowVisible( winId ):
-						window.title("SoF Console")
 					if float(scroll_y.get()[1]) > 0.9:
 						messages.see("end")
 					messages.configure(state="disable")
+		if win32gui.GetForegroundWindow() == winId:
+			window.title("SoF Console")
 		time.sleep(1)
 def winEnumHandler( hwnd, ctx ):
 	global winId
@@ -172,10 +175,11 @@ def Enter_pressed(event):
 			line2 = "set ~slot \"" + str(num) + "\""
 			#print("line2 =:" + line2)
 			f.seek(0)
-			f.write("//Sssome cvars\n")
-			f.write("                                 ")
-			f.write("                                 ")
+			f.write("                                 \n")
+			f.write("                                 \n")
+			f.write("                                 \n")
 			f.seek(0)
+			f.write("//Sssome cvars\n")
 			f.write(line1)
 			f.write(line2)
 		input_user.set('')
