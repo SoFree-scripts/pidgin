@@ -121,13 +121,13 @@ def checkUpdateLoop():
 def winEnumHandler( hwnd, ctx ):
 	global winId
 	#if win32gui.IsWindowVisible( hwnd ):
-	print (hex(hwnd), win32gui.GetWindowText( hwnd ))
+	#print (hex(hwnd), win32gui.GetWindowText( hwnd ))
 	if win32gui.GetWindowText( hwnd ) == "SoF console":
 		winId = hwnd
 def sofWinEnumHandler( hwnd, ctx ):
 	global sofId
 	#if win32gui.IsWindowVisible( hwnd ):
-	print (hex(hwnd), win32gui.GetWindowText( hwnd ))
+	#print (hex(hwnd), win32gui.GetWindowText( hwnd ))
 	if win32gui.GetWindowText( hwnd ) == "SoF":
 		sofId = hwnd
 
@@ -158,20 +158,19 @@ def Enter_pressed(event):
 		#set "~slot" ""
 		with open(func, "r+") as f:
 			line = f.readlines()
-			print(line)
+			#print(line)
 			if "String" in line[2]:
 				tmp = line[1]
 				line[1] = line[2]
 				line[2] = tmp
 			mySlot = line[2].split()
-			print(mySlot)
+			#print(mySlot)
 			num = mySlot[2].replace("\"","")
 			mySlot = ": [" + str(num) + "] "
-			print(mySlot)
 			input_get = input_get.replace("\"", "'")
 			line1 = "set msgString \"" + input_get + "\"\n"
 			line2 = "set ~slot \"" + str(num) + "\""
-			print("line2 =:" + line2)
+			#print("line2 =:" + line2)
 			f.seek(0)
 			f.write("//Sssome cvars\n")
 			f.write("                                 ")
