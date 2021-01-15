@@ -18,7 +18,7 @@ mixer.init()
 
 window = Tk()
 
-window.title("SoF console")
+window.title("SoF Console")
 messages = Text(window)
 messages.configure(state="disable",wrap=WORD,bg="black",fg="white")
 
@@ -115,7 +115,7 @@ def checkUpdateLoop():
 					if mySlot not in x:
 						#if its not our own input, no beep
 						window.title("Unread")
-						beep=mixer.Sound("hitmarker.wav") #Loading File Into Mixer
+						beep=mixer.Sound(resource_path("hitmarker.wav")) #Loading File Into Mixer
 						beep.set_volume(0.02)
 						beep.play() #Playing It In The Whole Device
 					if float(scroll_y.get()[1]) > 0.9:
@@ -124,6 +124,16 @@ def checkUpdateLoop():
 		if win32gui.GetForegroundWindow() == winId:
 			window.title("SoF Console")
 		time.sleep(1)
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def _from_rgb(rgb):
     """translates an rgb tuple of int to a tkinter friendly color code
@@ -146,7 +156,7 @@ def winEnumHandler( hwnd, ctx ):
 	global winId
 	#if win32gui.IsWindowVisible( hwnd ):
 	#print (hex(hwnd), win32gui.GetWindowText( hwnd ))
-	if win32gui.GetWindowText( hwnd ) == "SoF console":
+	if win32gui.GetWindowText( hwnd ) == "SoF Console":
 		winId = hwnd
 
 def sofWinEnumHandler( hwnd, ctx ):
