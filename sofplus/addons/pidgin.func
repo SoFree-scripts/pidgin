@@ -1,12 +1,17 @@
 function pidgin_init()
 {
-	set msgString ""
+	//----------------------------
+	//Set to 0 if you do not want to tell others you're on the desktop
+	set p_desk_notify "1"
+	//your @Desktop name
 	set desktop_name "@Desktop"
+	//----------------------------
 	sp_sc_flow_if text cvar name == cvar desktop_name
 	{
 		//we quit SoF while running the script minimised
 		set name "John Mullins"
 	}
+	set msgString ""
 	set desktop_name_orig #name
 	sp_sc_func_exec sof_pidgin_loop
 	sp_sc_func_exec spf_sc_list_onchange_add_func _sp_cl_info_state "sof_pidgin_set_slot"
@@ -31,16 +36,19 @@ function sof_pidgin_loop()
 		sp_sc_cvar_save pidgin.cfg msgString ~slot
 
 	}
-	sp_sc_exec_file "sofplus/data/pidgin_desktop.cfg"
-	sp_sc_flow_if text cvar ~desktop == val 1
+	sp_sc_flow_if number cvar p_desk_notify == val 1
 	{
-		set name #desktop_name
-		set ~desktop "0"
-		sp_sc_cvar_save pidgin_desktop.cfg ~desktop
-	}
-	else
-	{
-		set name #desktop_name_orig
+		sp_sc_exec_file "sofplus/data/pidgin_desktop.cfg"
+		sp_sc_flow_if text cvar ~desktop == val 1
+		{
+			set name #desktop_name
+			set ~desktop "0"
+			sp_sc_cvar_save pidgin_desktop.cfg ~desktop
+		}
+		else
+		{
+			set name #desktop_name_orig
+		}
 	}
 	//check for a new string every 5 seconds
 	sp_sc_timer 1000 "sp_sc_func_exec sof_pidgin_loop"
