@@ -139,15 +139,15 @@ def _from_rgb(rgb):
     """translates an rgb tuple of int to a tkinter friendly color code
     """
     return "#%02x%02x%02x" % rgb   
-
+#PlayerName : [0 s] im slot 0 and spectating!
 def setNameColour(x):
-	m = re.split(": \[\d{1,2}\]",x)
-	name = m[0]
+	m = re.split(": \[\d",x)
+	name = m[0][0:]
 	messages.tag_config("name", foreground=_from_rgb((37,188,36)))
 	messages.tag_config("name",font=("Georgia", "11", "bold"))
 	messages.insert(END, name, "name")
 	#client slot important
-	lname = len(m[0])
+	lname = len(name)
 	return x[lname:]
 	
 
