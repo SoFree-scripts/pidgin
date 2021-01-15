@@ -109,8 +109,8 @@ def checkUpdateLoop():
 							#reset string
 							insertMe = " "
 					insertMe += "\n"
-					messages.tag_config("tag2", foreground=_from_rgb((204,204,204)))
-					messages.insert(END, insertMe, "tag2")
+					messages.tag_config("text", foreground=_from_rgb((204,204,204)))
+					messages.insert(END, insertMe, "text")
 					#print(mySlot)
 					if mySlot not in x:
 						#if its not our own input, no beep
@@ -133,8 +133,9 @@ def _from_rgb(rgb):
 def setNameColour(x):
 	m = re.split(": \[\d{1,2}\]",x)
 	name = m[0]
-	messages.tag_config("tag1", foreground=_from_rgb((37,188,36)))
-	messages.insert(END, name, "tag1")
+	messages.tag_config("name", foreground=_from_rgb((37,188,36)))
+	messages.tag_config("name",font=("Georgia", "11", "bold"))
+	messages.insert(END, name, "name")
 	#client slot important
 	lname = len(m[0])
 	return x[lname:]
