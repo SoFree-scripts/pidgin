@@ -7,8 +7,8 @@ import webbrowser
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import mixer
 from win32 import win32gui
-#test = win32gui.FindWindow("SoF console",None)
-#print(test)
+import re
+
 
 log = os.path.join(".","sof.log")
 func = os.path.join(".","sofplus/data/pidgin.cfg")
@@ -95,6 +95,8 @@ def checkUpdateLoop():
 					#a chat message
 					insertMe = ""
 					messages.configure(state="normal")
+					#set name colour
+					x = setNameColour(x)
 					for s in x.split():
 						if "http" not in s:
 							insertMe += (str(s) + " ")
@@ -107,7 +109,8 @@ def checkUpdateLoop():
 							#reset string
 							insertMe = " "
 					insertMe += "\n"
-					messages.insert(END, '%s' % insertMe)
+					messages.tag_config("tag2", foreground=_from_rgb((204,204,204)))
+					messages.insert(END, insertMe, "tag2")
 					#print(mySlot)
 					if mySlot not in x:
 						#if its not our own input, no beep
@@ -121,12 +124,30 @@ def checkUpdateLoop():
 		if win32gui.GetForegroundWindow() == winId:
 			window.title("SoF Console")
 		time.sleep(1)
+
+def _from_rgb(rgb):
+    """translates an rgb tuple of int to a tkinter friendly color code
+    """
+    return "#%02x%02x%02x" % rgb   
+
+def setNameColour(x):
+	m = re.split(": \[\d{1,2}\]",x)
+	name = m[0]
+	messages.tag_config("tag1", foreground=_from_rgb((37,188,36)))
+	messages.insert(END, name, "tag1")
+	#client slot important
+	lname = len(m[0])
+	return x[lname:]
+	
+
+
 def winEnumHandler( hwnd, ctx ):
 	global winId
 	#if win32gui.IsWindowVisible( hwnd ):
 	#print (hex(hwnd), win32gui.GetWindowText( hwnd ))
 	if win32gui.GetWindowText( hwnd ) == "SoF console":
 		winId = hwnd
+
 def sofWinEnumHandler( hwnd, ctx ):
 	global sofId
 	#if win32gui.IsWindowVisible( hwnd ):
