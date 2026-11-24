@@ -1,4 +1,6 @@
 # pidgin
+Prefer pictures? Start with **[HUMANS.md](HUMANS.md)**.
+
 Fun example of SoFplus communicating with Python to allow sending/receiving of messages while on the desktop.
 
 Strings with 'http' in them are clickable.

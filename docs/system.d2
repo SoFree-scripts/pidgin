@@ -1,0 +1,78 @@
+# pidgin — system overview
+# A proof of concept that turns the game's own log file into a chat transport:
+# a Tkinter window tails sof.log and writes the cvar files a SoFplus addon polls.
+# Zones run left to right: entry points -> core -> state -> external.
+# Style classes set strokes only, so light and dark stay readable.
+
+title: |md
+  # pidgin
+  A Tkinter chat window for SoF that reads the game log and talks back through SoFplus cvar files.
+| {near: top-center}
+
+direction: right
+grid-columns: 2
+grid-rows: 2
+horizontal-gap: 150
+vertical-gap: 110
+
+entry: Entry points {
+  direction: down
+
+  exe: `im.exe` · auto-py-to-exe build of `im.py`, hit marker wav bundled
+  func: `sofplus/addons/pidgin.func` · `pidgin_init` runs at map load
+  key: Enter in the Tk entry · the only input path into the game
+}
+
+core: Core {
+  direction: down
+
+  tail: tail the log · one thread, every 1 s, from the byte offset in `seekdata`
+  filter: keep chat lines · only lines with the slot-count prefix reach the widget
+  paint: paint a line · name coloured by a regex split, `http` tokens clickable
+  alert: alert · window title set to Unread, hit marker, when the line is not ours
+  send: send a line · rewrite `pidgin.cfg` with `msgString` and the slot we think we are
+  loop: addon poll · every 1000 ms exec the cfg, and `say` the string if it is not empty
+  slot: learn the slot · on `_sp_cl_info_state` 8, save `_sp_cl_info_slot` for Python
+  desk: desktop flag · addon renames the player while the window has no focus
+
+  tail -> filter: an appended line
+  filter -> paint: chat only
+  paint -> alert: needs the slot to tell ours apart
+  send -> loop: the next poll picks it up
+  loop -> slot: cleared and saved after saying
+  loop -> desk: same tick, separate file
+}
+
+state: State {
+  direction: down
+
+  log: `sof.log` · every `say` lands here, appended by the game only {shape: cylinder}
+  cfg: `sofplus/data/pidgin.cfg` · `msgString` and `~slot`, rewritten in place
+  dcfg: `sofplus/data/pidgin_desktop.cfg` · one `~desktop` flag, Python writes, addon clears
+  seek: `seekdata` · byte offset of the last line already shown {shape: cylinder}
+}
+
+ext: External {
+  direction: down
+
+  game: SoF.exe · writes the log, runs the addon, owns the window titled `SoF`
+  sofplus: SoFplus scripting · `sp_sc_timer`, `sp_sc_exec_file`, `sp_sc_cvar_save`, `say`
+  win32: `win32gui` · `EnumWindows` for `SoF` and `SoF Console`, foreground check
+  gui: Tkinter and pygame · the widget, the scrollbar, the hit marker mixer
+}
+
+entry -> core: two loops, one direction each
+core -> state: the log goes one way, the cvars the other
+core -> ext: the game feeds the log and executes the cvars
+
+classes: {
+  entry: {style: {stroke: "#2f6fbf"}}
+  core: {style: {stroke: "#2f8f5f"}}
+  state: {style: {stroke: "#a86a12"; stroke-dash: 3}}
+  ext: {style: {stroke: "#8a4fbf"; stroke-dash: 5}}
+}
+
+entry.class: entry
+core.class: core
+state.class: state
+ext.class: ext
